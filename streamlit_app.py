@@ -121,25 +121,34 @@ def get_cimt_percentile(cimt_value, age, sex, race, side="right"):
 
 # --- Vascular Age ---
 def estimate_vascular_age_from_chart(cimt_avg, sex, race):
-    # Choose the appropriate chart
+    # Select race-specific chart if possible
     if race == "General (15-40 & 70+ only)":
         chart = general_chart[sex]
     else:
         group = f"{race} {sex}"
-        chart = chart_A_right if group in chart_A_right else chart_A_left  # Either side is fine for avg estimate
+        chart = chart_A_right if group in chart_A_right else chart_A_left
         chart = chart.get(group, {})
 
-    closest_age = None
-    smallest_diff = float("inf")
-    for age_point, percentiles in chart.items():
-        median_cimt = percentiles.get("50th")
-        if median_cimt is not None:
-            diff = abs(cimt_avg - median_cimt)
-            if diff < smallest_diff:
-                smallest_diff = diff
-                closest_age = age_point
+    # Collect all available median values
+    age_medians = [(age, data["50th"]) for age, data in chart.items() if "50th" in data]
 
-    return closest_age if closest_age is not None else "N/A"
+    if not age_medians:
+        return "N/A"
+
+    # Sort by age for consistency
+    age_medians.sort(key=lambda x: x[0])
+
+    # If below the lowest charted age median, fallback to general chart
+    lowest_age, lowest_median = age_medians[0]
+    if cimt_avg < lowest_median:
+        # Fallback to general chart
+        general_ages = sorted(general_chart[sex].keys())
+        closest_general_age = min(general_ages, key=lambda a: abs(general_chart[sex][a]["50th"] - cimt_avg))
+        return closest_general_age
+
+    # Find the closest chart age
+    closest_age = min(age_medians, key=lambda x: abs(x[1] - cimt_avg))[0]
+    return closest_age
 
 # --- Risk Impression Logic ---
 def generate_impression(rp, lp, has_plaque):
