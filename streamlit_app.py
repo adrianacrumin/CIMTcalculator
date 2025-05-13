@@ -10,8 +10,8 @@ st.title("CIMT Risk Report Calculator")
 right_cimt = st.number_input("Right CIMT (mm)", value=0.632, format="%.3f")
 left_cimt = st.number_input("Left CIMT (mm)", value=0.670, format="%.3f")
 age = st.number_input("Patient Age", min_value=15, max_value=100, value=49)
-sex = st.selectbox("Sex", ["Male", "Female"])
-race = st.selectbox("Race", ["White", "Black"])
+sex = st.selectbox("Sex", [ "Male", "Female"])
+race = st.selectbox("Race", ["General", "White", "Black"])
 plaque_input = st.text_input("Plaque sizes (comma-separated)", "2.0, 1.5")
 plaques = [float(p.strip()) for p in plaque_input.split(",") if p.strip()]
 avg_cimt = (right_cimt + left_cimt) / 2
@@ -20,36 +20,21 @@ avg_cimt = (right_cimt + left_cimt) / 2
 
 chart_A_right = {
     "White Male": {
-        25: {"25th": 0.611, "50th": 0.663, "75th": 0.768},
-        30: {"25th": 0.636, "50th": 0.702, "75th": 0.807},
-        35: {"25th": 0.662, "50th": 0.740, "75th": 0.845},
-        40: {"25th": 0.687, "50th": 0.779, "75th": 0.884},
         45: {"25th": 0.534, "50th": 0.617, "75th": 0.714},
         55: {"25th": 0.610, "50th": 0.711, "75th": 0.834},
         65: {"25th": 0.648, "50th": 0.758, "75th": 0.894}
     },
     "White Female": {
-        25: {"25th": 0.562, "50th": 0.633, "75th": 0.717},
-        30: {"25th": 0.586, "50th": 0.654, "75th": 0.735},
-        35: {"25th": 0.611, "50th": 0.676, "75th": 0.754},
-        40: {"25th": 0.635, "50th": 0.697, "75th": 0.772},
         45: {"25th": 0.509, "50th": 0.576, "75th": 0.660},
         55: {"25th": 0.575, "50th": 0.676, "75th": 0.760},
         65: {"25th": 0.608, "50th": 0.608, "75th": 0.810}
     },
     "Black Male": {
-        25: {"25th": 0.637, "50th": 0.719, "75th": 0.839},
-        30: {"25th": 0.675, "50th": 0.756, "75th": 0.884},
-        35: {"25th": 0.712, "50th": 0.793, "75th": 0.929},
-        40: {"25th": 0.750, "50th": 0.830, "75th": 0.974},
         45: {"25th": 0.514, "50th": 0.604, "75th": 0.700},
         55: {"25th": 0.614, "50th": 0.724, "75th": 0.824},
         65: {"25th": 0.714, "50th": 0.844, "75th": 1.000}
     },
     "Black Female": {
-        25: {"25th": 0.616, "50th": 0.682, "75th": 0.750},
-        30: {"25th": 0.650, "50th": 0.718, "75th": 0.793},
-        35: {"25th": 0.685, "50th": 0.754, "75th": 0.837},
         40: {"25th": 0.719, "50th": 0.790, "75th": 0.880},
         45: {"25th": 0.518, "50th": 0.588, "75th": 0.664},
         55: {"25th": 0.578, "50th": 0.668, "75th": 0.764},
@@ -60,59 +45,83 @@ chart_A_right = {
 #Chart A left
 chart_A_left = {
     "White Male": {
-        25: {"25th": 0.577, "50th": 0.655, "75th": 0.763},
-        30: {"25th": 0.617, "50th": 0.707, "75th": 0.814},
-        35: {"25th": 0.658, "50th": 0.760, "75th": 0.864},
-        40: {"25th": 0.698, "50th": 0.812, "75th": 0.915},
         45: {"25th": 0.556, "50th": 0.641, "75th": 0.748},
         55: {"25th": 0.620, "50th": 0.727, "75th": 0.864},
         65: {"25th": 0.652, "50th": 0.770, "75th": 0.922}
     },
     "White Female": {
-        25: {"25th": 0.554, "50th": 0.621, "75th": 0.660},
-        30: {"25th": 0.586, "50th": 0.657, "75th": 0.713},
-        35: {"25th": 0.618, "50th": 0.693, "75th": 0.766},
-        40: {"25th": 0.650, "50th": 0.729, "75th": 0.819},
         45: {"25th": 0.556, "50th": 0.641, "75th": 0.748},
         45: {"25th": 0.506, "50th": 0.580, "75th": 0.660},
         55: {"25th": 0.574, "50th": 0.664, "75th": 0.760},
         65: {"25th": 0.608, "50th": 0.706, "75th": 0.810}
     },
     "Black Male": {
-        25: {"25th": 0.640, "50th": 0.736, "75th": 0.794},
-        30: {"25th": 0.676, "50th": 0.774, "75th": 0.844},
-        35: {"25th": 0.713, "50th": 0.812, "75th": 0.894},
-        40: {"25th": 0.749, "50th": 0.850, "75th": 0.944},
         45: {"25th": 0.530, "50th": 0.614, "75th": 0.704},
         55: {"25th": 0.610, "50th": 0.714, "75th": 0.840},
         65: {"25th": 0.690, "50th": 0.814, "75th": 0.976}
     },
     "Black Female": {
-        25: {"25th": 0.587, "50th": 0.646, "75th": 0.714},
-        30: {"25th": 0.629, "50th": 0.691, "75th": 0.768},
-        35: {"25th": 0.670, "50th": 0.736, "75th": 0.822},
-        40: {"25th": 0.712, "50th": 0.781, "75th": 0.876},
         45: {"25th": 0.494, "50th": 0.566, "75th": 0.644},
         55: {"25th": 0.558, "50th": 0.646, "75th": 0.748},
         65: {"25th": 0.622, "50th": 0.726, "75th": 0.852}
     }
 }
 
+general_chart = {
+    "Male": {
+        15: {"2.5th": 0.263, "10th": 0.311, "25th": 0.354, "50th": 0.401, "75th": 0.449, "90th":0.492},
+        20: {"2.5th": 0.280, "10th": 0.331, "25th": 0.377, "50th": 0.427, "75th": 0.478, "90th":0.524},
+        25: {"2.5th": 0.297, "10th": 0.351, "25th": 0.400, "50th": 0.453, "75th": 0.507, "90th":0.556},
+        30: {"2.5th": 0.314, "10th": 0.372, "25th": 0.423, "50th": 0.479, "75th": 0.536, "90th":0.587},
+        35: {"2.5th": 0.331, "10th": 0.392, "25th": 0.446, "50th": 0.505, "75th": 0.565, "90th":0.619},
+        40: {"2.5th": 0.349, "10th": 0.412, "25th": 0.468, "50th": 0.531, "75th": 0.594, "90th":0.651},
+        70: {"2.5th": 0.451, "10th": 0.533, "25th": 0.606, "50th": 0.688, "75th": 0.769, "90th":0.842},
+        75: {"2.5th": 0.469, "10th": 0.554, "25th": 0.629, "50th": 0.714, "75th": 0.798, "90th":0.873},
+        80: {"2.5th": 0.486, "10th": 0.574, "25th": 0.652, "50th": 0.740, "75th": 0.827, "90th":0.905},
+        85: {"2.5th": 0.503, "10th": 0.594, "25th": 0.675, "50th": 0.766, "75th": 0.856, "90th":0.937}
+    },
+    
+    "Female": {
+        15: {"2.5th": 0.265, "10th": 0.311, "25th": 0.351, "50th": 0.396, "75th": 0.441, "90th":0.482},
+        20: {"2.5th": 0.282, "10th": 0.330, "25th": 0.373, "50th": 0.421, "75th": 0.469, "90th":0.512},
+        25: {"2.5th": 0.299, "10th": 0.350, "25th": 0.395, "50th": 0.446, "75th": 0.497, "90th":0.542},
+        30: {"2.5th": 0.315, "10th": 0.369, "25th": 0.417, "50th": 0.471, "75th": 0.524, "90th":0.572},
+        35: {"2.5th": 0.332, "10th": 0.389, "25th": 0.439, "50th": 0.496, "75th": 0.552, "90th":0.602},
+        40: {"2.5th": 0.349, "10th": 0.408, "25th": 0.461, "50th": 0.521, "75th": 0.580, "90th":0.633},
+        70: {"2.5th": 0.450, "10th": 0.526, "25th": 0.594, "50th": 0.670, "75th": 0.745, "90th":0.813},
+        75: {"2.5th": 0.466, "10th": 0.545, "25th": 0.616, "50th": 0.694, "75th": 0.773, "90th":0.843},
+        80: {"2.5th": 0.483, "10th": 0.565, "25th": 0.638, "50th": 0.719, "75th": 0.801, "90th":0.874},
+        85: {"2.5th": 0.500, "10th": 0.585, "25th": 0.660, "50th": 0.744, "75th": 0.828, "90th":0.904}
+        # ...
+    }
+}
 
 def get_cimt_percentile(cimt_value, age, sex, race, side="right"):
-    group = f"{race} {sex}"
-    chart = chart_A_right if side == "right" else chart_A_left
-    closest_age = min(chart[group].keys(), key=lambda x: abs(x - age))
-    thresholds = chart[group][closest_age]
-    if cimt_value <= thresholds["25th"]:
-        return "≤25th percentile"
-    elif cimt_value <= thresholds["50th"]:
-        return "25th–50th percentile"
-    elif cimt_value <= thresholds["75th"]:
-        return "50th–75th percentile"
+    if age <= 40 or age >= 65:
+        # General Chart Usage
+        closest_age = min(general_chart[sex].keys(), key=lambda x: abs(x - age))
+        thresholds = general_chart[sex][closest_age]
     else:
-        return "≥75th percentile"
+        # Race-Specific Chart Usage
+        group = f"{race} {sex}"
+        chart = chart_A_right if side == "right" else chart_A_left
+        closest_age = min(chart[group].keys(), key=lambda x: abs(x - age))
+        thresholds = chart[group][closest_age]
 
+    # Sort thresholds by numerical percentile value
+    sorted_thresholds = sorted(
+        thresholds.items(),
+        key=lambda x: float(x[0].replace("th", "").replace("≤", ""))
+    )
+
+    # Loop through sorted percentiles and find the closest match
+    for i, (percentile, value) in enumerate(sorted_thresholds):
+        if cimt_value <= value:
+            return f"{percentile} percentile"
+
+    # If above all thresholds
+    return f"Above {sorted_thresholds[-1][0]} percentile"
+    
 right_percentile = get_cimt_percentile(right_cimt, age, sex, race, "right")
 left_percentile = get_cimt_percentile(left_cimt, age, sex, race, "left")
 
@@ -134,16 +143,21 @@ has_plaque = plaque_burden > 0
 
 # --- Impression generator ---
 def generate_impression(rp, lp, has_plaque):
-    low = ["≤25th percentile", "25th percentile"]
-    high = ["≥75th percentile"]
-    if not has_plaque and rp in low and lp in low:
-        return "Risk of an adverse cardiovascular event is low based on carotid IMT findings and the absence of athersclerotic plaque. The patient's risk is not elecated above that established by traditional risk factors."
-    elif not has_plaque and (rp in high or lp in high):
-        return "Risk of an adverse cardiovascular event is [intermediate/high] based on carotid IMT findings and the absence of atherosclerotic plaque."
-    elif has_plaque and (rp in low and lp in low):
-        return "Risk of an adverse cardiovascular event is [low/intermediate/high] based on carotid IMT findings and the presence of atherosclerotic plaque."
+    low_risk_levels = ["2.5th percentile", "10th percentile", "25th percentile"]
+    high_risk_levels = ["75th percentile", "90th percentile", "Above 90th percentile"]
+
+    if not has_plaque:
+        if rp in low_risk_levels and lp in low_risk_levels:
+            return "Low cardiovascular risk based on CIMT and absence of plaque."
+        elif rp in high_risk_levels or lp in high_risk_levels:
+            return "High cardiovascular risk based on elevated CIMT without plaque."
+        else:
+            return "Moderate cardiovascular risk based on CIMT findings without plaque."
     else:
-        return "Risk of an adverse cardiovascular event is [low/intermediate/high] based on carotid IMT findings and the presence of atherosclerotic plaque."
+        if rp in high_risk_levels or lp in high_risk_levels:
+            return "High cardiovascular risk due to elevated CIMT and presence of plaque."
+        else:
+            return "Moderate cardiovascular risk due to presence of plaque despite lower CIMT."
 
 impression = generate_impression(right_percentile, left_percentile, has_plaque)
 
