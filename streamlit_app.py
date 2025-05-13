@@ -120,14 +120,26 @@ def get_cimt_percentile(cimt_value, age, sex, race, side="right"):
     return f"Above {sorted_thresholds[-1][0]} percentile"
 
 # --- Vascular Age ---
-def estimate_vascular_age(cimt_avg, sex):
-    base_cimt = 0.35  # Starting at CIMT of 0.35 mm ~ 20 years old
-    base_age = 20
-    increment_per_0_05mm = 5  # 5 years per 0.05 mm increase
-    steps = (cimt_avg - base_cimt) / 0.05
-    estimated_age = base_age + steps * increment_per_0_05mm
-    rounded_age = int(5 * round(estimated_age / 5))
-    return rounded_age
+def estimate_vascular_age_from_chart(cimt_avg, sex, race):
+    # Choose the appropriate chart
+    if race == "General (15-40 & 70+ only)":
+        chart = general_chart[sex]
+    else:
+        group = f"{race} {sex}"
+        chart = chart_A_right if group in chart_A_right else chart_A_left  # Either side is fine for avg estimate
+        chart = chart.get(group, {})
+
+    closest_age = None
+    smallest_diff = float("inf")
+    for age_point, percentiles in chart.items():
+        median_cimt = percentiles.get("50th")
+        if median_cimt is not None:
+            diff = abs(cimt_avg - median_cimt)
+            if diff < smallest_diff:
+                smallest_diff = diff
+                closest_age = age_point
+
+    return closest_age if closest_age is not None else "N/A"
 
 # --- Risk Impression Logic ---
 def generate_impression(rp, lp, has_plaque):
