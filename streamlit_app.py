@@ -97,29 +97,32 @@ general_chart = {
 }
 
 def get_cimt_percentile(cimt_value, age, sex, race, side="right"):
-    if age <= 40 or age >= 65:
-        # General Chart Usage
+    # Force general chart if race is not specified or if age is ≤40 or ≥65
+    if race == "General (no race-specific reference)" or age <= 40 or age >= 65:
         closest_age = min(general_chart[sex].keys(), key=lambda x: abs(x - age))
         thresholds = general_chart[sex][closest_age]
     else:
-        # Race-Specific Chart Usage
+        # Safely build group only when race-specific logic applies
         group = f"{race} {sex}"
         chart = chart_A_right if side == "right" else chart_A_left
+
+        # Check if group actually exists in the chart to avoid KeyError
+        if group not in chart:
+            return "No reference data available for this group"
+
         closest_age = min(chart[group].keys(), key=lambda x: abs(x - age))
         thresholds = chart[group][closest_age]
 
-    # Sort thresholds by numerical percentile value
+    # Sort and evaluate percentiles as before
     sorted_thresholds = sorted(
         thresholds.items(),
         key=lambda x: float(x[0].replace("th", "").replace("≤", ""))
     )
 
-    # Loop through sorted percentiles and find the closest match
     for i, (percentile, value) in enumerate(sorted_thresholds):
         if cimt_value <= value:
             return f"{percentile} percentile"
 
-    # If above all thresholds
     return f"Above {sorted_thresholds[-1][0]} percentile"
     
 right_percentile = get_cimt_percentile(right_cimt, age, sex, race, "right")
