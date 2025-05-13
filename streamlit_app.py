@@ -152,7 +152,8 @@ def estimate_vascular_age_from_chart(cimt_avg, sex, race):
 
 # --- Risk Impression Logic ---
 def generate_impression(rp, lp, has_plaque):
-    low_risk_levels = ["2.5th percentile", "10th percentile", "25th percentile"]
+    low_risk_levels = ["2.5th percentile", "10th percentile", "25th percentile", "Between 25th and 50th percentile"]
+    moderate_risk_levels = ["Between 50th and 75th percentile"]
     high_risk_levels = ["75th percentile", "90th percentile", "Above 90th percentile"]
 
     if not has_plaque:
