@@ -12,7 +12,7 @@ left_cimt = st.number_input("Left CIMT (mm)", value=0.0, format="%.3f")
 age = st.number_input("Patient Age", min_value=15, max_value=100, value=15)
 sex = st.selectbox("Sex", [ "Male", "Female"])
 race = st.selectbox("Race (General applies to ages 15-40 and 70+ only. Otherwise, you must select a Race)", ["General (15-40 & 70+)", "White", "Black"])
-plaque_input = st.text_input("Plaque sizes (comma-separated)", "0.0, 0.9")
+plaque_input = st.text_input("Plaque sizes (comma-separated)", "0.0, 0.0")
 plaques = [float(p.strip()) for p in plaque_input.split(",") if p.strip()]
 avg_cimt = (right_cimt + left_cimt) / 2
 
@@ -97,31 +97,40 @@ general_chart = {
 }
 
 def get_cimt_percentile(cimt_value, age, sex, race, side="right"):
-    # Force general chart if race is not specified or if age is ≤40 or ≥65
-    if race == "General (no race-specific reference)" or age <= 40 or age >= 65:
+    # Decide which chart to use
+    if race == "General (15-40 & 70+)" or age <= 40 or age >= 70:
         closest_age = min(general_chart[sex].keys(), key=lambda x: abs(x - age))
         thresholds = general_chart[sex][closest_age]
     else:
-        # Safely build group only when race-specific logic applies
         group = f"{race} {sex}"
         chart = chart_A_right if side == "right" else chart_A_left
 
-        # Check if group actually exists in the chart to avoid KeyError
         if group not in chart:
             return "No reference data available for this group"
 
         closest_age = min(chart[group].keys(), key=lambda x: abs(x - age))
         thresholds = chart[group][closest_age]
 
-    # Sort and evaluate percentiles as before
+    #sort thresholds numerically by percentile value (2.5, 10, 25, etc.)
     sorted_thresholds = sorted(
         thresholds.items(),
         key=lambda x: float(x[0].replace("th", "").replace("≤", ""))
     )
 
-    for i, (percentile, value) in enumerate(sorted_thresholds):
-        if cimt_value <= value:
-            return f"{percentile} percentile"
+    #below the lowest threshold
+    if cimt_value <= sorted_thresholds[0][1]:
+        return f"Below {sorted_thresholds[0][0]} percentile"
+
+    #find range between thresholds
+    for i in range(len(sorted_thresholds) - 1):
+        lower_label, lower_value = sorted_thresholds[i]
+        upper_label, upper_value = sorted_thresholds[i + 1]
+
+        if lower_value < cimt_value <= upper_value:
+            return f"Between {lower_label} and {upper_label} percentile"
+
+    #above the highest threshold
+    return f"Above {sorted_thresholds[-1][0]} percentile"
 
     return f"Above {sorted_thresholds[-1][0]} percentile"
     
@@ -130,15 +139,16 @@ left_percentile = get_cimt_percentile(left_cimt, age, sex, race, "left")
 
 # --- Vascular Age ---
 def estimate_vascular_age(cimt_avg, sex):
-    vascular_age_curve = {
-        "Male": {0.50: 35, 0.55: 40, 0.60: 45, 0.65: 50, 0.70: 55, 0.75: 60, 0.80: 65, 0.85: 70, 0.90: 75},
-        "Female": {0.50: 40, 0.55: 45, 0.60: 50, 0.65: 55, 0.70: 60, 0.75: 65, 0.80: 70, 0.85: 75, 0.90: 80}
-    }
-    values = vascular_age_curve[sex]
-    closest = min(values.keys(), key=lambda x: abs(cimt_avg - x))
-    return values[closest]
+    base_cimt = 0.35  #CIMT at age 20
+    base_age = 20
+    increment_per_0_05mm = 5
 
-vascular_age = estimate_vascular_age(avg_cimt, sex)
+    steps = (cimt_avg - base_cimt) / 0.05
+    estimated_age = base_age + steps * increment_per_0_05mm
+
+    # Round to nearest 5
+    rounded_age = int(5 * round(estimated_age / 5))
+    return rounded_age
 
 # --- Plaque burden ---
 plaque_burden = sum(p for p in plaques if p >= 1.2)
