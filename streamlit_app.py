@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="CIMT Risk Calculator", layout="centered")
-
 st.title("CIMT Risk Report Calculator")
 
 # --- Input section ---
@@ -14,7 +13,6 @@ sex = st.selectbox("Sex", [ "Male", "Female"])
 race = st.selectbox("Race (General applies to ages 15-40 and 70+ only. Otherwise, you must select a Race)", ["General (15-40 & 70+)", "White", "Black"])
 plaque_input = st.text_input("Plaque sizes (comma-separated)", "0.0, 0.0")
 plaques = [float(p.strip()) for p in plaque_input.split(",") if p.strip()]
-avg_cimt = (right_cimt + left_cimt) / 2
 
 # --- Chart A values ---
 
@@ -97,64 +95,41 @@ general_chart = {
 }
 
 def get_cimt_percentile(cimt_value, age, sex, race, side="right"):
-    # Decide which chart to use
     if race == "General (15-40 & 70+)" or age <= 40 or age >= 70:
         closest_age = min(general_chart[sex].keys(), key=lambda x: abs(x - age))
         thresholds = general_chart[sex][closest_age]
     else:
         group = f"{race} {sex}"
         chart = chart_A_right if side == "right" else chart_A_left
-
         if group not in chart:
             return "No reference data available for this group"
-
         closest_age = min(chart[group].keys(), key=lambda x: abs(x - age))
         thresholds = chart[group][closest_age]
 
-    #sort thresholds numerically by percentile value (2.5, 10, 25, etc.)
-    sorted_thresholds = sorted(
-        thresholds.items(),
-        key=lambda x: float(x[0].replace("th", "").replace("≤", ""))
-    )
+    sorted_thresholds = sorted(thresholds.items(), key=lambda x: float(x[0].replace("th", "")))
 
-    #below the lowest threshold
     if cimt_value <= sorted_thresholds[0][1]:
         return f"Below {sorted_thresholds[0][0]} percentile"
 
-    #find range between thresholds
     for i in range(len(sorted_thresholds) - 1):
         lower_label, lower_value = sorted_thresholds[i]
         upper_label, upper_value = sorted_thresholds[i + 1]
-
         if lower_value < cimt_value <= upper_value:
             return f"Between {lower_label} and {upper_label} percentile"
 
-    #above the highest threshold
     return f"Above {sorted_thresholds[-1][0]} percentile"
-
-    return f"Above {sorted_thresholds[-1][0]} percentile"
-    
-right_percentile = get_cimt_percentile(right_cimt, age, sex, race, "right")
-left_percentile = get_cimt_percentile(left_cimt, age, sex, race, "left")
 
 # --- Vascular Age ---
 def estimate_vascular_age(cimt_avg, sex):
-    base_cimt = 0.35  #CIMT at age 20
+    base_cimt = 0.35  # Starting at CIMT of 0.35 mm ~ 20 years old
     base_age = 20
-    increment_per_0_05mm = 5
-
+    increment_per_0_05mm = 5  # 5 years per 0.05 mm increase
     steps = (cimt_avg - base_cimt) / 0.05
     estimated_age = base_age + steps * increment_per_0_05mm
-
-    # Round to nearest 5
     rounded_age = int(5 * round(estimated_age / 5))
     return rounded_age
 
-# --- Plaque burden ---
-plaque_burden = sum(p for p in plaques if p >= 1.2)
-has_plaque = plaque_burden > 0
-
-# --- Impression generator ---
+# --- Risk Impression Logic ---
 def generate_impression(rp, lp, has_plaque):
     low_risk_levels = ["2.5th percentile", "10th percentile", "25th percentile"]
     high_risk_levels = ["75th percentile", "90th percentile", "Above 90th percentile"]
@@ -172,33 +147,42 @@ def generate_impression(rp, lp, has_plaque):
         else:
             return "Moderate cardiovascular risk due to presence of plaque despite lower CIMT."
 
-impression = generate_impression(right_percentile, left_percentile, has_plaque)
+# --- Output Section with Guard Clause ---
+if right_cimt > 0 and left_cimt > 0:
+    avg_cimt = (right_cimt + left_cimt) / 2
+    right_percentile = get_cimt_percentile(right_cimt, age, sex, race, "right")
+    left_percentile = get_cimt_percentile(left_cimt, age, sex, race, "left")
+    vascular_age = estimate_vascular_age(avg_cimt, sex)
+    plaque_burden = sum(p for p in plaques if p >= 1.2)
+    has_plaque = plaque_burden > 0
+    impression = generate_impression(right_percentile, left_percentile, has_plaque)
 
-# --- Output section ---
-st.subheader("CIMT Risk Summary")
-st.write(f"**Right CIMT**: {right_cimt} mm → _{right_percentile}_")
-st.write(f"**Left CIMT**: {left_cimt} mm → _{left_percentile}_")
-st.write(f"**Average CIMT**: {avg_cimt:.3f} mm")
-st.write(f"**Vascular Age Estimate**: {vascular_age} years")
-st.write(f"**Plaque Burden**: {plaque_burden:.3f} mm")
-st.markdown(f"**Impression**: _{impression}_")
+    # Display the CIMT Risk Summary
+    st.subheader("CIMT Risk Summary")
+    st.write(f"**Right CIMT**: {right_cimt} mm → _{right_percentile}_")
+    st.write(f"**Left CIMT**: {left_cimt} mm → _{left_percentile}_")
+    st.write(f"**Average CIMT**: {avg_cimt:.3f} mm")
+    st.write(f"**Vascular Age Estimate**: {vascular_age} years")
+    st.write(f"**Plaque Burden**: {plaque_burden:.3f} mm")
+    st.markdown(f"**Impression**: _{impression}_")
+    st.markdown("**Note:** There is a 95% correlation between carotid and coronary arteries for presence of plaque. "
+                "Consider further testing such as coronary calcium scoring for high-risk patients.")
 
-st.markdown("**Note:** There is a 95% correlation between carotid and coronary arteries for presence of plaque. "
-            "Consider further testing such as coronary calcium scoring for high-risk patients.")
+    # --- Visualization Chart ---
+    ages = np.arange(15, 86)
+    male_curve = 0.5 + 0.006 * (ages - 15)
+    female_curve = 0.48 + 0.0055 * (ages - 15)
 
-# --- Chart 3 Visualization ---
-ages = np.arange(15, 86)
-male_curve = 0.5 + 0.006 * (ages - 15)
-female_curve = 0.48 + 0.0055 * (ages - 15)
-
-fig, ax = plt.subplots()
-ax.plot(ages, male_curve, label="Male Avg", color="black")
-ax.plot(ages, female_curve, label="Female Avg", color="gray")
-ax.axhline(avg_cimt, color="red", linestyle="--", label="Patient CIMT")
-ax.scatter(vascular_age, avg_cimt, color="red", zorder=5)
-ax.set_xlabel("Age")
-ax.set_ylabel("CIMT (mm)")
-ax.set_title("Vascular Age Estimate (Chart 3)")
-ax.grid(True)
-ax.legend()
-st.pyplot(fig)
+    fig, ax = plt.subplots()
+    ax.plot(ages, male_curve, label="Male Avg", color="black")
+    ax.plot(ages, female_curve, label="Female Avg", color="gray")
+    ax.axhline(avg_cimt, color="red", linestyle="--", label="Patient CIMT")
+    ax.scatter(vascular_age, avg_cimt, color="red", zorder=5)
+    ax.set_xlabel("Age")
+    ax.set_ylabel("CIMT (mm)")
+    ax.set_title("Vascular Age Estimate (Chart 3)")
+    ax.grid(True)
+    ax.legend()
+    st.pyplot(fig)
+else:
+    st.info("Please enter valid Right and Left CIMT values greater than 0.0 to generate the report.")
