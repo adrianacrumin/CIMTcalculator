@@ -164,7 +164,7 @@ if right_cimt > 0 and left_cimt > 0:
     avg_cimt = (right_cimt + left_cimt) / 2
     right_percentile = get_cimt_percentile(right_cimt, age, sex, race, "right")
     left_percentile = get_cimt_percentile(left_cimt, age, sex, race, "left")
-    vascular_age = estimate_vascular_age(avg_cimt, sex)
+    vascular_age = estimate_vascular_age_from_chart(avg_cimt, sex, race)
     plaque_burden = sum(p for p in plaques if p >= 1.2)
     has_plaque = plaque_burden > 0
     impression = generate_impression(right_percentile, left_percentile, has_plaque)
