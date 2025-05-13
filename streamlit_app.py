@@ -11,7 +11,7 @@ right_cimt = st.number_input("Right CIMT (mm)", value=0.0, format="%.3f")
 left_cimt = st.number_input("Left CIMT (mm)", value=0.0, format="%.3f")
 age = st.number_input("Patient Age", min_value=15, max_value=100, value=15)
 sex = st.selectbox("Sex", [ "Male", "Female"])
-race = st.selectbox("Race", ["General", "White", "Black"])
+race = st.selectbox("Race", ["General Chart being used", "White", "Black"])
 plaque_input = st.text_input("Plaque sizes (comma-separated)", "0.0, 0.9")
 plaques = [float(p.strip()) for p in plaque_input.split(",") if p.strip()]
 avg_cimt = (right_cimt + left_cimt) / 2
