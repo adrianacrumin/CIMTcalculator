@@ -189,11 +189,12 @@ def plot_cimt_chart_with_point_pairs(avg_cimt, vascular_age, sex):
     ax.plot(female_ages, female_cimt_values, label="Average Female", color="gray", linewidth=2)
     ax.axhline(y=avg_cimt, color="red", linestyle="--", label="Patient CIMT")
     ax.scatter(vascular_age, avg_cimt, color="red", s=100, zorder=5, label=f"Vascular Age: {vascular_age}")
+
     ax.set_xlabel("Age (years)")
     ax.set_ylabel("Mean Distal 1 cm CCA IMT (mm)")
     ax.set_title("Mean Distal 1 cm CCA IMT of General Population\nwith No Coronary Heart History")
     ax.set_xlim(0, 90)
-    ax.set_xsticks(np.arange(0, 95, 5))
+    ax.set_xticks(np.arange(0, 95, 5))  # Set ticks from 0 to 90 by 5
     ax.set_ylim(0.00, 1.15)
     ax.set_yticks(np.arange(0.00, 1.20, 0.05))
     ax.grid(True)
