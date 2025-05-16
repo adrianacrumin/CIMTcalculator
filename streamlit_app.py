@@ -53,14 +53,27 @@ def get_cimt_percentile(cimt_value, age, sex, race, side="right"):
     return f"Above {sorted_thresholds[-1][0]} percentile"
 
 def estimate_vascular_age_from_curve(cimt_avg, sex):
-    ages = np.arange(15, 86)
-    if sex == "Male":
-        curve = 0.35 + 0.008 * (ages - 15)
-    else:
-        curve = 0.33 + 0.0075 * (ages - 15)
+    # Same points as in your plot function
+    male_curve_points = [
+        (6, 0.38), (10, 0.395), (15, 0.43), (20, 0.475), (22, 0.50), (25, 0.50),
+        (28, 0.50), (30, 0.51), (35, 0.545), (37, 0.55), (40, 0.58), (41, 0.595),
+        (45, 0.61), (47, 0.605), (50, 0.65), (55, 0.70), (60, 0.75), (65, 0.80),
+        (70, 0.85), (75, 0.90), (80, 0.95), (90, 1.00)
+    ]
 
-    closest_age = ages[np.abs(curve - cimt_avg).argmin()]
-    return closest_age
+    female_curve_points = [
+        (6, 0.38), (10, 0.405), (15, 0.40), (21, 0.449), (25.5, 0.449), (30, 0.48),
+        (35, 0.50), (36, 0.515), (41.5, 0.53), (45, 0.55), (50, 0.59), (55, 0.635),
+        (60, 0.68), (65, 0.715), (70, 0.765), (75, 0.81), (80, 0.86), (85, 0.91)
+    ]
+
+    # Choose points based on sex
+    curve_points = male_curve_points if sex == "Male" else female_curve_points
+    curve_ages, curve_cimt_values = zip(*curve_points)
+
+    # Find closest age where CIMT matches best
+    idx = np.abs(np.array(curve_cimt_values) - cimt_avg).argmin()
+    return curve_ages[idx]
 
 def generate_impression(rp, lp, has_plaque):
     low_risk_levels = ["2.5th percentile","Between 2.5th and 10th percentile", "10th percentile",  "Between 10th and 25th percentile", "25th percentile", "Between 25th and 50th percentile"]
