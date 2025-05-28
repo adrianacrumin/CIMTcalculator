@@ -9,7 +9,7 @@ st.title("CIMT Risk Report Calculator")
 # --- Input Section ---
 right_cimt = st.number_input("Right CIMT (mm)", format="%.3f")
 left_cimt = st.number_input("Left CIMT (mm)", format="%.3f")
-age = st.number_input("Patient Age", min_value=15, max_value=100, value=15)
+age = st.number_input("Patient Age", min_value=15, max_value=100)
 sex = st.selectbox("Sex", ["Male", "Female"])
 
 if age <= 42 or age >= 67:
