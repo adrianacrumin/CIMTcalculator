@@ -18,7 +18,7 @@ if age <= 42 or age >= 67:
 else:
     race = st.selectbox("Select Race (Required for ages 43-66)", ["White", "Black"])
 
-plaque_input = st.text_input("Plaque sizes (comma-separated)", "0.0, 0.0")
+plaque_input = st.text_input("Plaque sizes (comma-separated)")
 plaques = [float(p.strip()) for p in plaque_input.split(",") if p.strip()]
 
 # --- Chart Definitions ---
