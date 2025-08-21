@@ -22,8 +22,6 @@ plaque_input = st.text_input("Plaque sizes (comma-separated)")
 plaques = [float(p.strip()) for p in plaque_input.split(",") if p.strip()]
 
 # --- Chart Definitions ---
-# --- Chart A values ---
-
 chart_A_right = {
     "White Male": {
         45: {"25th": 0.496, "50th": 0.570, "75th": 0.654},
@@ -51,7 +49,6 @@ chart_A_right = {
     }
 }
 
-#Chart A left
 chart_A_left = {
     "White Male": {
         45: {"25th": 0.524, "50th": 0.598, "75th": 0.690},
@@ -81,35 +78,38 @@ chart_A_left = {
 
 general_chart = {
     "Male": {
-        15: {"2.5th": 0.263, "10th": 0.311, "25th": 0.354, "50th": 0.401, "75th": 0.449, "90th":0.492},
-        20: {"2.5th": 0.280, "10th": 0.331, "25th": 0.377, "50th": 0.427, "75th": 0.478, "90th":0.524},
-        25: {"2.5th": 0.297, "10th": 0.351, "25th": 0.400, "50th": 0.453, "75th": 0.507, "90th":0.556},
-        30: {"2.5th": 0.314, "10th": 0.372, "25th": 0.423, "50th": 0.479, "75th": 0.536, "90th":0.587},
-        35: {"2.5th": 0.331, "10th": 0.392, "25th": 0.446, "50th": 0.505, "75th": 0.565, "90th":0.619},
-        40: {"2.5th": 0.349, "10th": 0.412, "25th": 0.468, "50th": 0.531, "75th": 0.594, "90th":0.651},
-        70: {"2.5th": 0.451, "10th": 0.533, "25th": 0.606, "50th": 0.688, "75th": 0.769, "90th":0.842},
-        75: {"2.5th": 0.469, "10th": 0.554, "25th": 0.629, "50th": 0.714, "75th": 0.798, "90th":0.873},
-        80: {"2.5th": 0.486, "10th": 0.574, "25th": 0.652, "50th": 0.740, "75th": 0.827, "90th":0.905},
-        85: {"2.5th": 0.503, "10th": 0.594, "25th": 0.675, "50th": 0.766, "75th": 0.856, "90th":0.937}
+        15: {"2.5th": 0.263, "10th": 0.311, "25th": 0.354, "50th": 0.401, "75th": 0.449, "90th": 0.492},
+        20: {"2.5th": 0.280, "10th": 0.331, "25th": 0.377, "50th": 0.427, "75th": 0.478, "90th": 0.524},
+        25: {"2.5th": 0.297, "10th": 0.351, "25th": 0.400, "50th": 0.453, "75th": 0.507, "90th": 0.556},
+        30: {"2.5th": 0.314, "10th": 0.372, "25th": 0.423, "50th": 0.479, "75th": 0.536, "90th": 0.587},
+        35: {"2.5th": 0.331, "10th": 0.392, "25th": 0.446, "50th": 0.505, "75th": 0.565, "90th": 0.619},
+        40: {"2.5th": 0.349, "10th": 0.412, "25th": 0.468, "50th": 0.531, "75th": 0.594, "90th": 0.651},
+        70: {"2.5th": 0.451, "10th": 0.533, "25th": 0.606, "50th": 0.688, "75th": 0.769, "90th": 0.842},
+        75: {"2.5th": 0.469, "10th": 0.554, "25th": 0.629, "50th": 0.714, "75th": 0.798, "90th": 0.873},
+        80: {"2.5th": 0.486, "10th": 0.574, "25th": 0.652, "50th": 0.740, "75th": 0.827, "90th": 0.905},
+        85: {"2.5th": 0.503, "10th": 0.594, "25th": 0.675, "50th": 0.766, "75th": 0.856, "90th": 0.937}
     },
-    
     "Female": {
-        15: {"2.5th": 0.265, "10th": 0.311, "25th": 0.351, "50th": 0.396, "75th": 0.441, "90th":0.482},
-        20: {"2.5th": 0.282, "10th": 0.330, "25th": 0.373, "50th": 0.421, "75th": 0.469, "90th":0.512},
-        25: {"2.5th": 0.299, "10th": 0.350, "25th": 0.395, "50th": 0.446, "75th": 0.497, "90th":0.542},
-        30: {"2.5th": 0.315, "10th": 0.369, "25th": 0.417, "50th": 0.471, "75th": 0.524, "90th":0.572},
-        35: {"2.5th": 0.332, "10th": 0.389, "25th": 0.439, "50th": 0.496, "75th": 0.552, "90th":0.602},
-        40: {"2.5th": 0.349, "10th": 0.408, "25th": 0.461, "50th": 0.521, "75th": 0.580, "90th":0.633},
-        70: {"2.5th": 0.450, "10th": 0.526, "25th": 0.594, "50th": 0.670, "75th": 0.745, "90th":0.813},
-        75: {"2.5th": 0.466, "10th": 0.545, "25th": 0.616, "50th": 0.694, "75th": 0.773, "90th":0.843},
-        80: {"2.5th": 0.483, "10th": 0.565, "25th": 0.638, "50th": 0.719, "75th": 0.801, "90th":0.874},
-        85: {"2.5th": 0.500, "10th": 0.585, "25th": 0.660, "50th": 0.744, "75th": 0.828, "90th":0.904}
-        # ...
+        15: {"2.5th": 0.265, "10th": 0.311, "25th": 0.351, "50th": 0.396, "75th": 0.441, "90th": 0.482},
+        20: {"2.5th": 0.282, "10th": 0.330, "25th": 0.373, "50th": 0.421, "75th": 0.469, "90th": 0.512},
+        25: {"2.5th": 0.299, "10th": 0.350, "25th": 0.395, "50th": 0.446, "75th": 0.497, "90th": 0.542},
+        30: {"2.5th": 0.315, "10th": 0.369, "25th": 0.417, "50th": 0.471, "75th": 0.524, "90th": 0.572},
+        35: {"2.5th": 0.332, "10th": 0.389, "25th": 0.439, "50th": 0.496, "75th": 0.552, "90th": 0.602},
+        40: {"2.5th": 0.349, "10th": 0.408, "25th": 0.461, "50th": 0.521, "75th": 0.580, "90th": 0.633},
+        70: {"2.5th": 0.450, "10th": 0.526, "25th": 0.594, "50th": 0.670, "75th": 0.745, "90th": 0.813},
+        75: {"2.5th": 0.466, "10th": 0.545, "25th": 0.616, "50th": 0.694, "75th": 0.773, "90th": 0.843},
+        80: {"2.5th": 0.483, "10th": 0.565, "25th": 0.638, "50th": 0.719, "75th": 0.801, "90th": 0.874},
+        85: {"2.5th": 0.500, "10th": 0.585, "25th": 0.660, "50th": 0.744, "75th": 0.828, "90th": 0.904}
     }
 }
-# --- Functions ---
 
-def get_cimt_percentile(cimt_value, age, sex, race, side="right"):
+# --- Helpers: band + label and impression ---
+def cimt_band_and_label(cimt_value, age, sex, race, side="right"):
+    """
+    Returns:
+      band  : 0=≤25th, 1=25–50th, 2=50–75th, 3=≥75th
+      label : human-readable label to display
+    """
     if race == "General (15-40 & 70+)" or age <= 40 or age >= 70:
         closest_age = min(general_chart[sex].keys(), key=lambda x: abs(x - age))
         thresholds = general_chart[sex][closest_age]
@@ -117,23 +117,39 @@ def get_cimt_percentile(cimt_value, age, sex, race, side="right"):
         group = f"{race} {sex}"
         chart = chart_A_right if side == "right" else chart_A_left
         if group not in chart:
-            return "No reference data available for this group"
+            return 0, "No reference data available for this group"
         closest_age = min(chart[group].keys(), key=lambda x: abs(x - age))
         thresholds = chart[group][closest_age]
 
-    sorted_thresholds = sorted(thresholds.items(), key=lambda x: float(x[0].replace("th", "")))
+    v25, v50, v75 = thresholds["25th"], thresholds["50th"], thresholds["75th"]
 
-    if cimt_value <= sorted_thresholds[0][1]:
-        return f"Below {sorted_thresholds[0][0]} percentile"
+    if cimt_value <= v25:
+        return 0, "≤25th percentile"
+    elif cimt_value <= v50:
+        return 1, "25th–50th percentile"
+    elif cimt_value <= v75:
+        return 2, "Between 50th and 75th percentile"
+    else:
+        return 3, "Above 75th percentile"
 
-    for i in range(len(sorted_thresholds) - 1):
-        lower_label, lower_value = sorted_thresholds[i]
-        upper_label, upper_value = sorted_thresholds[i + 1]
-        if lower_value < cimt_value <= upper_value:
-            return f"Between {lower_label} and {upper_label} percentile"
+def generate_impression(r_band, l_band, has_plaque):
+    worst = max(r_band, l_band)
+    if not has_plaque:
+        if worst >= 3:
+            return "High cardiovascular risk based on elevated CIMT (≥75th percentile) without plaque."
+        elif worst == 2:
+            return "Moderate cardiovascular risk based on CIMT in the 50th–75th percentile without plaque."
+        else:
+            return "Low cardiovascular risk based on CIMT (≤50th percentile) and absence of plaque."
+    else:
+        if worst >= 3:
+            return "High cardiovascular risk due to plaque and CIMT ≥75th percentile."
+        elif worst == 2:
+            return "Moderate cardiovascular risk due to plaque with CIMT in the 50th–75th percentile."
+        else:
+            return "Moderate cardiovascular risk due to presence of plaque despite lower CIMT."
 
-    return f"Above {sorted_thresholds[-1][0]} percentile"
-
+# --- Vascular age (your original) ---
 def estimate_vascular_age_from_curve(cimt_avg, sex):
     male_curve_points = [
         (6, 0.38), (10, 0.395), (15, 0.43), (20, 0.475), (22, 0.50), (25, 0.50),
@@ -150,24 +166,6 @@ def estimate_vascular_age_from_curve(cimt_avg, sex):
     curve_ages, curve_cimt_values = zip(*curve_points)
     idx = np.abs(np.array(curve_cimt_values) - cimt_avg).argmin()
     return curve_ages[idx]
-
-def generate_impression(rp, lp, has_plaque):
-    low = ["2.5th percentile", "Between 2.5th and 10th percentile", "10th percentile", "Between 10th and 25th percentile", "25th percentile", "Between 25th and 50th percentile"]
-    moderate = ["50th percentile", "Between 50th and 75th percentile"]
-    high = ["75th percentile", "Between 75th and 90th percentile", "90th percentile", "Above 90th percentile"]
-
-    if not has_plaque:
-        if rp in low and lp in low:
-            return "Low cardiovascular risk based on CIMT and absence of plaque."
-        elif rp in high or lp in high:
-            return "High cardiovascular risk based on elevated CIMT without plaque."
-        else:
-            return "Moderate cardiovascular risk based on CIMT findings without plaque."
-    else:
-        if rp in high or lp in high:
-            return "High cardiovascular risk due to elevated CIMT and presence of plaque."
-        else:
-            return "Moderate cardiovascular risk due to presence of plaque despite lower CIMT."
 
 def plot_cimt_chart_with_point_pairs(avg_cimt, vascular_age, sex):
     male_curve_points = [
@@ -194,7 +192,7 @@ def plot_cimt_chart_with_point_pairs(avg_cimt, vascular_age, sex):
     ax.set_ylabel("Mean Distal 1 cm CCA IMT (mm)")
     ax.set_title("Mean Distal 1 cm CCA IMT of General Population\nwith No Coronary Heart History")
     ax.set_xlim(0, 80)
-    ax.set_xticks(np.arange(0, 90, 5))  # Set ticks from 0 to 90 by 5
+    ax.set_xticks(np.arange(0, 90, 5))
     ax.set_ylim(0.00, 1.15)
     ax.set_yticks(np.arange(0.00, 1.20, 0.05))
     ax.grid(True)
@@ -205,15 +203,17 @@ def plot_cimt_chart_with_point_pairs(avg_cimt, vascular_age, sex):
 if right_cimt > 0 and left_cimt > 0:
     avg_cimt = (right_cimt + left_cimt) / 2
     vascular_age = estimate_vascular_age_from_curve(avg_cimt, sex)
-    right_percentile = get_cimt_percentile(right_cimt, age, sex, race, "right")
-    left_percentile = get_cimt_percentile(left_cimt, age, sex, race, "left")
+
+    r_band, right_percentile = cimt_band_and_label(right_cimt, age, sex, race, "right")
+    l_band, left_percentile  = cimt_band_and_label(left_cimt,  age, sex, race, "left")
+
     plaque_burden = sum(p for p in plaques if p >= 1.2)
     has_plaque = plaque_burden > 0
-    impression = generate_impression(right_percentile, left_percentile, has_plaque)
+    impression = generate_impression(r_band, l_band, has_plaque)
 
     st.subheader("CIMT Risk Summary")
-    st.write(f"**Right CIMT**: {right_cimt} mm → _{right_percentile}_")
-    st.write(f"**Left CIMT**: {left_cimt} mm → _{left_percentile}_")
+    st.write(f"**Right CIMT**: {right_cimt:.3f} mm → _{right_percentile}_")
+    st.write(f"**Left CIMT**: {left_cimt:.3f} mm → _{left_percentile}_")
     st.write(f"**Average CIMT**: {avg_cimt:.3f} mm")
     st.write(f"**Vascular Age Estimate**: {vascular_age} years")
     st.write(f"**Plaque Burden**: {plaque_burden:.3f} mm")
