@@ -26,7 +26,7 @@ def _parse_cimt(s: str) -> float:
 
 right_cimt = _parse_cimt(right_cimt_raw)
 left_cimt  = _parse_cimt(left_cimt_raw)
----
+# ---
 if age <= 42 or age >= 67:
     st.write("General population reference is used for ages ≤42 or ≥67.")
     race = "General (15-40 & 70+)"
