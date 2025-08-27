@@ -7,21 +7,26 @@ st.set_page_config(page_title="CIMT Risk Calculator", layout="centered")
 st.title("CIMT Risk Report Calculator")
 
 # --- Input Section ---
-right_cimt = st.number_input(
-    "Right CIMT (mm)", 
-    min_value=0.0, 
-    step=0.001, 
-    format="%.3f"
-)
-left_cimt = st.number_input(
-    "Left CIMT (mm)", 
-    min_value=0.0, 
-    step=0.001, 
-    format="%.3f"
-)
+right_cimt_raw = st.text_input("Right CIMT (mm)", value="", placeholder="e.g., 4.20 or .876")
+left_cimt_raw  = st.text_input("Left CIMT (mm)",  value="", placeholder="e.g., 4.20 or .876")
 age = st.number_input("Patient Age", min_value=15, max_value=100)
 sex = st.selectbox("Sex", ["Male", "Female"])
 
+def _parse_cimt(s: str) -> float:
+    s = s.strip()
+    if not s:
+        return 0.0
+    if s.startswith("."):
+        s = "0" + s
+    try:
+        v = float(s)
+        return max(0.0, v)  # keep non-negative
+    except ValueError:
+        return 0.0
+
+right_cimt = _parse_cimt(right_cimt_raw)
+left_cimt  = _parse_cimt(left_cimt_raw)
+---
 if age <= 42 or age >= 67:
     st.write("General population reference is used for ages ≤42 or ≥67.")
     race = "General (15-40 & 70+)"
