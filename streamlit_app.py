@@ -7,8 +7,18 @@ st.set_page_config(page_title="CIMT Risk Calculator", layout="centered")
 st.title("CIMT Risk Report Calculator")
 
 # --- Input Section ---
-right_cimt = st.number_input("Right CIMT (mm)", format="%.3f")
-left_cimt = st.number_input("Left CIMT (mm)", format="%.3f")
+right_cimt = st.number_input(
+    "Right CIMT (mm)", 
+    min_value=0.0, 
+    step=0.001, 
+    format="%.3f"
+)
+left_cimt = st.number_input(
+    "Left CIMT (mm)", 
+    min_value=0.0, 
+    step=0.001, 
+    format="%.3f"
+)
 age = st.number_input("Patient Age", min_value=15, max_value=100)
 sex = st.selectbox("Sex", ["Male", "Female"])
 
